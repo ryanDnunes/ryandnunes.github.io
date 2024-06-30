@@ -1,0 +1,110 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    position: relative; /* Garante que o body seja o contexto de posicionamento */
+    background-image: url('imagens/fundoreal.jpg'); /* Substitua pelo caminho da sua imagem */
+    background-size: cover; /* Faz a imagem cobrir todo o fundo */
+    background-position: center; /* Centraliza a imagem no fundo */
+    background-repeat: no-repeat; /* Evita que a imagem se repita */
+}
+
+.container {
+    max-width: 500px;
+    margin: auto;
+    background-color: rgba(240, 240, 240, 0.8); /* Cor de fundo com opacidade */
+    padding: 20px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+input, select, button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    box-sizing: border-box;
+}
+
+.primeiro_texto {
+    margin-bottom: 20px;
+    color: #231d28; /* Cor do texto */
+    font-size: 24px;
+    font-family: Courier New, monospace; /* Tipo de letra específico para o título */
+}
+
+.video-player {
+    width: 30%; /* Define a largura do vídeo */
+    max-width: 300px; /* Define a largura máxima do vídeo */
+    display: block; /* Garante que o vídeo seja exibido como bloco */
+    position: absolute; /* Posiciona o vídeo de forma absoluta */
+    top: 100px; /* Afasta o vídeo 20px do topo */
+    left: 20px; /* Alinha o vídeo 20px à esquerda */
+}
+
+.texto_video {
+    margin-bottom: 20px; /* Margem inferior para separar do vídeo */
+    color: #231d28; /* Cor do texto */
+    font-size: 16px; /* Tamanho da fonte */
+    font-family: Snell Roundhand, cursive; /* Tipo de letra específico para o texto */
+    background-color: white; /* Cor de fundo para o texto */
+    padding: 10px; /* Espaçamento interno */
+    border-radius: 5px; /* Borda arredondada */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    display: inline-block; /* Faz o parágrafo comportar-se como um bloco inline */
+    max-width: 100%; /* Define a largura máxima */
+    word-wrap: break-word; /* Quebra de palavra para evitar que o texto ultrapasse */
+    overflow-wrap: break-word; /* Quebra de palavra para evitar que o texto ultrapasse */
+}
+
+
+.img_premio{
+    width: 30%; /* Define a largura do vídeo */
+    max-width: 300px; /* Define a largura máxima do vídeo */
+    display: block; /* Garante que o vídeo seja exibido como bloco */
+    position: absolute; /* Posiciona o vídeo de forma absoluta */
+    top: 100px; /* Afasta o vídeo 20px do topo */
+    left: 1000px; /* Alinha o vídeo 20px à esquerda */  
+}
+
+.img_gif, .img_gif2 {
+    width: 30%; /* Define a largura da imagem */
+    max-width: 300px; /* Define a largura máxima da imagem */
+    display: block; /* Garante que a imagem seja exibida como bloco */
+    position: absolute; /* Posiciona a imagem de forma absoluta */
+}
+
+.img_gif {
+    top: 100px; /* Afasta a imagem 100px do topo */
+    left: 0; /* Começa a imagem à esquerda */
+    animation: moveHorizontal 5s linear infinite; /* Animação para mover horizontalmente */
+}
+
+.img_gif2 {
+    top: 400px; /* Afasta a imagem 400px do topo */
+    right: 0; /* Começa a imagem à direita */
+    transform: scaleX(-1); /* Espelha a imagem horizontalmente */
+    animation: moveHorizontalReverse 5s linear infinite; /* Animação para mover horizontalmente em sentido inverso */
+}
+
+@keyframes moveHorizontal {
+    0% {
+        left: 0;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+@keyframes moveHorizontalReverse {
+    0% {
+        right: 0;
+    }
+    100% {
+        right: 100%;
+    }
+}

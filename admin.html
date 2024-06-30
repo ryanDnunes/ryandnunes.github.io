@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rifa - Criadores</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        label[for="file-input"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Painel de Controle</h1>
+        <button id="draw-button">Sortear</button>
+        <button id="export-button">Exportar Excel</button>
+        <button id="reset-button">Reiniciar</button>
+        <input type="file" id="file-input" accept=".csv">
+        <label for="file-input">Inserir Novo Excel</label>
+    </div>
+
+    <script>
+        document.getElementById('draw-button').addEventListener('click', function() {
+            const raffleData = JSON.parse(localStorage.getItem('raffleData'));
+            const chosenNumbers = raffleData.filter(item => !item.disponibilidade);
+            if (chosenNumbers.length < 3) {
+                alert('Não há números suficientes confirmados para sortear.');
+                return;
+            }
+
+            const winners = [];
+            while (winners.length < 3) {
+                const index = Math.floor(Math.random() * chosenNumbers.length);
+                if (!winners.includes(chosenNumbers[index])) {
+                    winners.push(chosenNumbers[index]);
+                }
+            }
+
+            alert(`Vencedores:\n1º: ${winners[0].nome} (${winners[0].telefone})\n2º: ${winners[1].nome} (${winners[1].telefone})\n3º: ${winners[2].nome} (${winners[2].telefone})`);
+        });
+
+        document.getElementById('export-button').addEventListener('click', function() {
+            const raffleData = JSON.parse(localStorage.getItem('raffleData'));
+            const csvContent = "data:text/csv;charset=utf-8,"
+                + "numero,disponibilidade,nome,email,telefone\n"
+                + raffleData.map(e => `${e.numero},${e.disponibilidade},${e.nome},${e.email},${e.telefone}`).join("\n");
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "rifa.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        document.getElementById('reset-button').addEventListener('click', function() {
+            if (confirm('Tem certeza que deseja reiniciar a rifa? Todos os dados serão perdidos.')) {
+                const initialData = [];
+                for (let i = 1; i <= 1000; i++) {
+                    initialData.push({ numero: i, disponibilidade: true, nome: '', email: '', telefone: '' });
+                }
+                localStorage.setItem('raffleData', JSON.stringify(initialData));
+                alert('Rifa reiniciada com sucesso!');
+                location.reload(); // Recarrega a página após a reinicialização
+            }
+        });
+
+        document.getElementById('file-input').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const contents = e.target.result;
+                    const lines = contents.split('\n').map(line => line.split(','));
+                    const newRaffleData = lines.slice(1).map(line => ({
+                        numero: parseInt(line[0]),
+                        disponibilidade: line[1] === 'true',
+                        nome: line[2],
+                        email: line[3],
+                        telefone: line[4]
+                    }));
+
+                    localStorage.setItem('raffleData', JSON.stringify(newRaffleData));
+                    alert('Novo Excel inserido com sucesso!');
+                    location.reload(); // Recarrega a página após a atualização
+                };
+                reader.readAsText(file);
+            }
+        });
+    </script>
+</body>
+</html>
