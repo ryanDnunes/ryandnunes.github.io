@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rifa - Cliente e Administração</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-section {
+            display: none; /* Oculta a seção de administração inicialmente */
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        label[for="file-input"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="cliente-section">
+        <p class="texto_video">
+            A bike do Victor foi roubada a uma semana, era uma das<br>
+            poucas coisas que o ajudava na luta contra a obesidade
+        </p>
+        <video src="imagens/video1.mp4" controls class="video-player"></video>
+        <img src="imagens/fundo2.png" class="img_premio">
+        <img src="imagens/gif_bike.gif" class="img_gif">
+        <img src="imagens/gif_bike.gif" class="img_gif2">
+        <div class="container">
+            <h1 class="primeiro_texto">Rifa do Victor:</h1>
+            <form id="raffle-form">
+                <label for="name">Nome</label>
+                <input type="text" id="name" name="name" required>
+                <label for="phone">Telefone</label>
+                <input type="text" id="phone" name="phone" required>
+                <label for="email">Email (opcional)</label>
+                <input type="email" id="email" name="email">
+                <label for="number">Número</label>
+                <select id="number" name="number" required>
+                    <!-- Números disponíveis serão preenchidos aqui pelo JavaScript -->
+                </select>
+                <button type="submit">Confirmar</button>
+            </form>
+            <button id="admin-button">Administração</button>
+        </div>
+    </div>
+
+    <div class="admin-section" id="admin-section">
+        <div class="container">
+            <h1>Painel de Controle</h1>
+            <button id="draw-button">Sortear</button>
+            <button id="export-button">Exportar Excel</button>
+            <button id="reset-button">Reiniciar</button>
+            <input type="file" id="file-input" accept=".csv">
+            <label for="file-input">Inserir Novo Excel</label>
+        </div>
+    </div>
+
+    <div id="admin-login" class="container">
+        <h2>Login de Administração</h2>
+        <label for="admin-password">Senha</label>
+        <input type="password" id="admin-password">
+        <button id="login-button">Entrar</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializa os números disponíveis se não estiverem no localStorage
+            if (!localStorage.getItem('raffleData')) {
+                const initialData = [];
+                for (let i = 1; i <= 1000; i++) {
+                    initialData.push({ numero: i, disponibilidade: true, nome: '', email: '', telefone: '' });
+                }
+                localStorage.setItem('raffleData', JSON.stringify(initialData));
+            }
+
+            const raffleData = JSON.parse(localStorage.getItem('raffleData'));
+            const availableNumbers = raffleData.filter(item => item.disponibilidade);
+
+            const select = document.getElementById('number');
+            availableNumbers.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.numero;
+                option.textContent = item.numero;
+                select.appendChild(option);
+            });
+
+            document.getElementById('raffle-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const name = document.getElementById('name').value;
+                const phone = document.getElementById('phone').value;
+                const email = document.getElementById('email').value;
+                const number = parseInt(document.getElementById('number').value);
+
+                const index = raffleData.findIndex(item => item.numero === number);
+                if (index !== -1 && raffleData[index].disponibilidade) {
+                    raffleData[index].disponibilidade = false;
+                    raffleData[index].nome = name;
+                    raffleData[index].telefone = phone;
+                    raffleData[index].email = email;
+
+                    localStorage.setItem('raffleData', JSON.stringify(raffleData));
+                    alert('Número confirmado com sucesso!');
+                    location.reload(); // Recarrega a página após a confirmação
+                } else {
+                    alert('Erro ao confirmar número. Tente novamente.');
+                }
+            });
+
+            document.getElementById('admin-button').addEventListener('click', function() {
+                document.getElementById('admin-login').style.display = 'block';
+            });
+
+            document.getElementById('login-button').addEventListener('click', function() {
+                const password = document.getElementById('admin-password').value;
+                if (password === '2106tricolor1307') {
+                    document.getElementById('admin-section').style.display = 'block';
+                    document.getElementById('admin-login').style.display = 'none';
+                } else {
+                    alert('Senha incorreta!');
+                }
+            });
+
+            document.getElementById('draw-button').addEventListener('click', function() {
+                const raffleData = JSON.parse(localStorage.getItem('raffleData'));
+                const chosenNumbers = raffleData.filter(item => !item.disponibilidade);
+                if (chosenNumbers.length < 3) {
+                    alert('Não há números suficientes confirmados para sortear.');
+                    return;
+                }
+
+                const winners = [];
+                while (winners.length < 3) {
+                    const index = Math.floor(Math.random() * chosenNumbers.length);
+                    if (!winners.includes(chosenNumbers[index])) {
+                        winners.push(chosenNumbers[index]);
+                    }
+                }
+
+                alert(`Vencedores:\n1º: ${winners[0].nome} (${winners[0].telefone})\n2º: ${winners[1].nome} (${winners[1].telefone})\n3º: ${winners[2].nome} (${winners[2].telefone})`);
+            });
+
+            document.getElementById('export-button').addEventListener('click', function() {
+                const raffleData = JSON.parse(localStorage.getItem('raffleData'));
+                const csvContent = "data:text/csv;charset=utf-8,"
+                    + "numero,disponibilidade,nome,email,telefone\n"
+                    + raffleData.map(e => `${e.numero},${e.disponibilidade},${e.nome},${e.email},${e.telefone}`).join("\n");
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "rifa.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            document.getElementById('reset-button').addEventListener('click', function() {
+                if (confirm('Tem certeza que deseja reiniciar a rifa? Todos os dados serão perdidos.')) {
+                    const initialData = [];
+                    for (let i = 1; i <= 1000; i++) {
+                        initialData.push({ numero: i, disponibilidade: true, nome: '', email: '', telefone: '' });
+                    }
+                    localStorage.setItem('raffleData', JSON.stringify(initialData));
+                    alert('Rifa reiniciada com sucesso!');
+                    location.reload(); // Recarrega a página após a reinicialização
+                }
+            });
+
+            document.getElementById('file-input').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const contents = e.target.result;
+                        const lines = contents.split('\n').map(line => line.split(','));
+                        const newRaffleData = lines.slice(1).map(line => ({
+                            numero: parseInt(line[0]),
+                            disponibilidade: line[1] === 'true',
+                            nome: line[2],
+                            email: line[3],
+                            telefone: line[4]
+                        }));
+
+                        localStorage.setItem('raffleData', JSON.stringify(newRaffleData));
+                        alert('Novo Excel inserido com sucesso!');
+                        location.reload(); // Recarrega a página após a atualização
+                    };
+                    reader.readAsText(file);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
